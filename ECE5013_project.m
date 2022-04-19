@@ -54,7 +54,7 @@ tx1=[ 0, lambda/4]; tx2=[0, -lambda/4]; rx=[0,0];
 % calculate azimuth angle, range, and received signals at each location
 for k=0:Np-1
 
-    target=[R0*cosd(theta)-k*Tp*v R0*sind(theta)];
+    target=[R0*cosd(theta) R0*sind(theta)-k*Tp*v];
     Rup1 = norm(tx1-target);    % Rup1 = distance between TX1 antenna and target
     Rup2 = norm(tx2-target);    % Rup2 = distance between TX2 antenna and target
     Rdown = norm(rx-target);    % Rdown = distance between RX antenna and target
@@ -119,10 +119,8 @@ rangedoppler1=fftshift( fft(matcharray1,128,1),1);
 
 subplot(2,2,2)
 nugrid=1/Np*(-Np/2:1:(Np/2)-1);
-taugrid=(0:500)*Ts*c/2;
-imagesc(taugrid,nugrid*fs, abs(rangedoppler1))
-xlabel('Range (m)'); ylabel('Normalized Frequency (sec)');
-
+imagesc(taugrid,nugrid*lambda*fp/2, abs(rangedoppler1))
+xlabel('Range (m)'); ylabel('Velocity_{Doppler} (m/sec)');
 
 subplot(2,2,3)
 imagesc(taugrid,1:64,abs(matcharray2));
@@ -131,8 +129,9 @@ xlabel('Range (m)'); ylabel('Pulse No');
 rangedoppler2=fftshift( fft(matcharray2,128,1),1);
 
 subplot(2,2,4)
-imagesc(taugrid,nugrid*fs, abs(rangedoppler2))
-xlabel('Range (m)'); ylabel('Normalized Frequency (sec)');
+imagesc(taugrid,nugrid*lambda*fp/2, abs(rangedoppler2))
+xlabel('Range (m)'); ylabel('Velocity_{Doppler} (m/sec)');
+
 %Things to try, window the match filter, window the pulses, add ground
 %return, use MTI cancelling, zeropad FFT, label the range doppler map in 
 %velocity(m/sec) and Range( meters)
