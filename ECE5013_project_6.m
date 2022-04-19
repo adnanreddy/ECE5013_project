@@ -1,7 +1,11 @@
 %% 6.
 
 CPI = ceil(2*25*tand(10)*fp/v/64);
-initial_target = zeros(1,CPI);
+
+initial_x  = 25;
+initial_y = 25*sind(theta) + [0:13]*(Np*Tp*v)
+
+%%
 
 for i = 1:CPI
     ECE5013_project;
