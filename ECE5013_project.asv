@@ -1,7 +1,7 @@
 %% Karan Mehta & Adnan Reddy, ECE5013 Project, 2022-04-11
-% clc
-% clear 
-% close all
+clc
+clear 
+close all
 
 %% Physical Constants
 c = 3e8;            % speed of light
@@ -39,7 +39,7 @@ R0 = 30;            % R0 is initially 30 meters
 theta = -10;        % theta = azimuth angle, initially at -10 degrees
 v = 10;             % vertical  velocity is 10 m/s
 RCS = 1;            % radar cross-section
-%CPI = 881/64        % coherent processing interval
+CPI = 881/64        % coherent processing interval
 
 %% Received signals
 za1 = zeros(size(t));   % received signal from transmitter 1
@@ -132,6 +132,8 @@ xlabel('Range (m)'); ylabel('Velocity (m/sec)');
 subplot(2,2,3)
 imagesc(taugrid,1:Np,abs(matcharray2));
 xlabel('Range (m)'); ylabel('Pulse No');
+
+
 
 subplot(2,2,4)
 imagesc(taugrid,nugrid*lambda*fp/2, abs(rangedoppler2))
