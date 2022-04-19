@@ -94,24 +94,45 @@ for k=0:Np-1
 end
 
 
-matcharray=zeros(Np,501);
+%matcharray=zeros(Np,501);
+%for k=0:Np-1
+ %   matcharray(k+1,:)=conv(receivearray(k+1,:),h1+h2,'valid');
+%end
+
+matcharray1=zeros(Np,501);
 for k=0:Np-1
-    matcharray(k+1,:)=conv(receivearray(k+1,:),h1+h2,'valid');
+   matcharray1(k+1,:)=conv(receivearray(k+1,:),h1+h2,'valid');
 end
 
+matcharray2=zeros(Np,501);
+for k=0:Np-1
+    matcharray2(k+1,:)=conv(receivearray(k+1,:),h2,'valid');
+end
 
 %%
+subplot(2,2,1)
 taugrid=(0:500)*Ts*c/2;
-figure(1);imagesc(taugrid,1:64,abs(matcharray));
+imagesc(taugrid,1:64,abs(matcharray1));
 xlabel('Range (m)'); ylabel('Pulse No');
 
-rangedoppler=fftshift( fft(matcharray,[],1),1);
+rangedoppler1=fftshift( fft(matcharray1,128,1),1);
 
+subplot(2,2,2)
 nugrid=1/Np*(-Np/2:1:(Np/2)-1);
 taugrid=(0:500)*Ts*c/2;
-figure(2);imagesc(taugrid,nugrid*fs, abs(rangedoppler))
+imagesc(taugrid,nugrid*fs, abs(rangedoppler1))
 xlabel('Range (m)'); ylabel('Normalized Frequency (sec)');
 
+
+subplot(2,2,3)
+imagesc(taugrid,1:64,abs(matcharray2));
+xlabel('Range (m)'); ylabel('Pulse No');
+
+rangedoppler2=fftshift( fft(matcharray2,128,1),1);
+
+subplot(2,2,4)
+imagesc(taugrid,nugrid*fs, abs(rangedoppler2))
+xlabel('Range (m)'); ylabel('Normalized Frequency (sec)');
 %Things to try, window the match filter, window the pulses, add ground
 %return, use MTI cancelling, zeropad FFT, label the range doppler map in 
 %velocity(m/sec) and Range( meters)
