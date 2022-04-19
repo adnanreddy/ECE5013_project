@@ -14,7 +14,7 @@ lambda = c/fc;          % wavelength of radar system
 BW = 125e6;             % total system bandwidth = 125 MHz
 fp = 1e3;               % pulse repetition frequency = 1 kHz
 Tp = 1/fp;              % pulse repetition interval = 1 ms
-Np = 1;                 % number of pulses
+Np = 64;                % number of pulses
 
 
 beta = 120e6;           % sweep bandwidth = 120 MHz
@@ -39,7 +39,7 @@ R0 = 30;            % R0 is initially 30 meters
 theta = -10;        % theta = azimuth angle, initially at -10 degrees
 v = 10;             % vertical  velocity is 10 m/s
 RCS = 1;            % radar cross-section
-CPI = 881/64        % coherent processing interval
+%CPI = 881/64        % coherent processing interval
 
 %% Received signals
 za1 = zeros(size(t));   % received signal from transmitter 1
@@ -55,7 +55,9 @@ tx1=[ 0, lambda/4]; tx2=[0, -lambda/4]; rx=[0,0];
 % calculate azimuth angle, range, and received signals at each location
 for k=0:Np-1
 
-    target=[R0*cosd(theta) R0*sind(theta)-k*Tp*v];
+%     target=[R0*cosd(theta) R0*sind(theta)-k*Tp*v];
+    target = [initial_x initial_y()]
+    
     Rup1 = norm(tx1-target);    % Rup1 = distance between TX1 antenna and target
     Rup2 = norm(tx2-target);    % Rup2 = distance between TX2 antenna and target
     Rdown = norm(rx-target);    % Rdown = distance between RX antenna and target
@@ -117,7 +119,7 @@ taugrid=(0:500)*Ts*c/2;
 nugrid=1/M*(-M/2:1:(M/2)-1);
 
 rangedoppler1=fftshift( fft(matcharray1,M,1),1);
-rangedoppler2=fftshift( fft(matcharray2,128,1),1);
+rangedoppler2=fftshift( fft(matcharray2,M,1),1);
 
 %% Graph
 
@@ -132,8 +134,6 @@ xlabel('Range (m)'); ylabel('Velocity (m/sec)');
 subplot(2,2,3)
 imagesc(taugrid,1:Np,abs(matcharray2));
 xlabel('Range (m)'); ylabel('Pulse No');
-
-
 
 subplot(2,2,4)
 imagesc(taugrid,nugrid*lambda*fp/2, abs(rangedoppler2))

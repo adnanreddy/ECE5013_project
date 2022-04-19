@@ -1,7 +1,7 @@
 %% Karan Mehta & Adnan Reddy, ECE5013 Project, 2022-04-11
-clc
-clear 
-close all
+% clc
+% clear 
+% close all
 
 %% Physical Constants
 c = 3e8;            % speed of light
@@ -14,7 +14,7 @@ lambda = c/fc;          % wavelength of radar system
 BW = 125e6;             % total system bandwidth = 125 MHz
 fp = 1e3;               % pulse repetition frequency = 1 kHz
 Tp = 1/fp;              % pulse repetition interval = 1 ms
-Np = 64;                % number of pulses
+Np = 1;                % number of pulses
 
 
 beta = 120e6;           % sweep bandwidth = 120 MHz
@@ -55,8 +55,8 @@ tx1=[ 0, lambda/4]; tx2=[0, -lambda/4]; rx=[0,0];
 % calculate azimuth angle, range, and received signals at each location
 for k=0:Np-1
 
-%     target=[R0*cosd(theta) R0*sind(theta)-k*Tp*v]; % default
-    target = [initial_x initial_y(CPI)+k*Tp*v]; % for CPI for loop, COMMENT OTHERWISE
+    target=[R0*cosd(theta) R0*sind(theta)-k*Tp*v]; % default
+%     target = [initial_x initial_y(CPI)+k*Tp*v]; % for CPI for loop, COMMENT OTHERWISE
     
     Rup1 = norm(tx1-target);    % Rup1 = distance between TX1 antenna and target
     Rup2 = norm(tx2-target);    % Rup2 = distance between TX2 antenna and target
