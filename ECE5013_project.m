@@ -14,7 +14,7 @@ lambda = c/fc;          % wavelength of radar system
 BW = 125e6;             % total system bandwidth = 125 MHz
 fp = 1e3;               % pulse repetition frequency = 1 kHz
 Tp = 1/fp;              % pulse repetition interval = 1 ms
-Np = 1;                % number of pulses
+Np = 64;                % number of pulses
 
 
 beta = 120e6;           % sweep bandwidth = 120 MHz
@@ -55,8 +55,8 @@ tx1=[ 0, lambda/4]; tx2=[0, -lambda/4]; rx=[0,0];
 % calculate azimuth angle, range, and received signals at each location
 for k=0:Np-1
 
-    target=[R0*cosd(theta) R0*sind(theta)-k*Tp*v]; % default
-%     target = [initial_x initial_y(CPI)+k*Tp*v]; % for CPI for loop, COMMENT OTHERWISE
+%     target=[R0*cosd(theta) R0*sind(theta)+k*Tp*v]; % default
+    target = [initial_x initial_y(CPI)+k*Tp*v]; % for CPI for loop, COMMENT OTHERWISE
     
     Rup1 = norm(tx1-target);    % Rup1 = distance between TX1 antenna and target
     Rup2 = norm(tx2-target);    % Rup2 = distance between TX2 antenna and target
@@ -96,15 +96,9 @@ for k=0:Np-1
     receivearray(k+1,:)=za(k*uint64(Tp*fs)+1:round(k*uint64(Tp*fs)+tau*fs+500));
 end
 
-
-%matcharray=zeros(Np,501);
-%for k=0:Np-1
- %   matcharray(k+1,:)=conv(receivearray(k+1,:),h1+h2,'valid');
-%end
-
 matcharray1=zeros(Np,501);
 for k=0:Np-1
-   matcharray1(k+1,:)=conv(receivearray(k+1,:),h1+h2,'valid');
+   matcharray1(k+1,:)=conv(receivearray(k+1,:),h1,'valid');
 end
 
 matcharray2=zeros(Np,501);
@@ -115,7 +109,7 @@ end
 %%
 M = 64;
 
-taugrid=(0:500)*Ts*c/2;
+taugrid=(0:500);
 nugrid=1/M*(-M/2:1:(M/2)-1);
 
 rangedoppler1=fftshift( fft(matcharray1,M,1),1);
@@ -123,21 +117,21 @@ rangedoppler2=fftshift( fft(matcharray2,M,1),1);
 
 %% Graph
 
-subplot(2,2,1)
-imagesc(taugrid,1:Np,abs(matcharray1));
-xlabel('Range (m)'); ylabel('Pulse No');
-
-subplot(2,2,2)
-imagesc(taugrid,nugrid*lambda*fp/2, abs(rangedoppler1))
-xlabel('Range (m)'); ylabel('Velocity (m/sec)');
-
-subplot(2,2,3)
-imagesc(taugrid,1:Np,abs(matcharray2));
-xlabel('Range (m)'); ylabel('Pulse No');
-
-subplot(2,2,4)
-imagesc(taugrid,nugrid*lambda*fp/2, abs(rangedoppler2))
-xlabel('Range (m)'); ylabel('Velocity (m/sec)');
+% subplot(2,2,1)
+% imagesc(taugrid*Ts*c/2,1:Np,abs(matcharray1));
+% xlabel('Range (m)'); ylabel('Pulse No');
+% 
+% subplot(2,2,2)
+% imagesc(taugrid*Ts*c/2,nugrid*lambda*fp/2, abs(rangedoppler1))
+% xlabel('Range (m)'); ylabel('Velocity (m/sec)');
+% 
+% subplot(2,2,3)
+% imagesc(taugrid*Ts*c/2,1:Np,abs(matcharray2));
+% xlabel('Range (m)'); ylabel('Pulse No');
+% 
+% subplot(2,2,4)
+% imagesc(taugrid*Ts*c/2,nugrid*lambda*fp/2, abs(rangedoppler2))
+% xlabel('Range (m)'); ylabel('Velocity (m/sec)');
 
 %Things to try, window the match filter, window the pulses, add ground
 %return, use MTI cancelling, zeropad FFT, label the range doppler map in 
