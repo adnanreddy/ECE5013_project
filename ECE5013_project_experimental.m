@@ -43,75 +43,79 @@ RCS = 1;            % radar cross-section
 
 %%
 
-fid=fopen('measured_data.bin','rb');
-
 M=256; % number of pulses in one CPI
 N_cpi= 32; % number of CPIs in data
 
-% for ii=1:N_cpi
-for ii=N_cpi:N_cpi % for testing
-    phase_history1=zeros(301,M);
-    phase_history2=zeros(301,M);
+figure(800);
 
-    for jj=1:M
-        phase_history1(:,jj)=fread(fid,301,'double');
-        phase_history1(:,jj)=phase_history1(:,jj)+1i*fread(fid,301,'double');
+while size(findobj(800)) > 0
+    fid=fopen('measured_data.bin','rb');
+    for ii=1:N_cpi
+    % for ii=N_cpi:N_cpi % for testing
+        phase_history1=zeros(301,M);
+        phase_history2=zeros(301,M);
 
-        phase_history2(:,jj)=fread(fid,301,'double');
-        phase_history2(:,jj)=phase_history2(:,jj)+1i*fread(fid,301,'double');
+        for jj=1:M
+            phase_history1(:,jj)=fread(fid,301,'double');
+            phase_history1(:,jj)=phase_history1(:,jj)+1i*fread(fid,301,'double');
+
+            phase_history2(:,jj)=fread(fid,301,'double');
+            phase_history2(:,jj)=phase_history2(:,jj)+1i*fread(fid,301,'double');
+        end
+
+        %only Range bins >=131 have target information, earlier range bins are
+        %due to antenna coupling, TX leaking into RX, delays in the radar.
+        % row range-bins 0:170, columns :pulse_no 1:M
+
+        phase_history1=phase_history1(131:end,:);
+        phase_history2=phase_history2(131:end,:);
+
+        phase_history1 = phase_history1';
+        phase_history2 = phase_history2';
+
+        % phase_history matrix: row range-bins 0:170, columns :pulse_no 1:M
+        % Construct Range Doppler map from the two antennas and display.
+        % Consider canceling stationary clutter (two/three pulse canceller, or 
+        % subtracting average (across slow time) range-profile from each return
+
+        % SUBTRACT SLOW TIME AVERAGE
+        phase_history1=phase_history1 - mean(phase_history1,1);
+        phase_history2=phase_history2 - mean(phase_history2,1);
+
+        % TWO PULSE CANCELLER
+
+%         phase_history1 = phase_history1 - [zeros()]
+
+        % GRAPH
+        taugrid=(130:300);
+        nugrid=1/M*(-M/2:1:(M/2)-1);
+
+
+        rangedoppler1=fftshift( fft(hamming(M).*phase_history1,M,1),1);
+        rangedoppler2=fftshift( fft(hamming(M).*phase_history2,M,1),1);
+
+        subplot(2,2,1)
+        imagesc(taugrid*Ts*c/2,1:Np,abs(phase_history1));
+        xlabel('Range (m)'); ylabel('Pulse No');
+        title_string = strcat('Slow-Fast Time, Tx1, CPI=',num2str(ii)); title(title_string);
+
+        subplot(2,2,3)
+        imagesc(taugrid*Ts*c/2,nugrid*lambda*fp/2, abs(rangedoppler1))
+        xlabel('Range (m)'); ylabel('Velocity (m/sec)');
+        title_string = strcat('Range-Doppler, Tx1, CPI=',num2str(ii)); title(title_string);
+
+        subplot(2,2,2)
+        imagesc(taugrid*Ts*c/2,1:Np,abs(phase_history2));
+        xlabel('Range (m)'); ylabel('Pulse No');
+        title_string = strcat('Slow-Fast Time, Tx2, CPI=',num2str(ii)); title(title_string);
+
+        subplot(2,2,4)
+        imagesc(taugrid*Ts*c/2,nugrid*lambda*fp/2, abs(rangedoppler2))
+        xlabel('Range (m)'); ylabel('Velocity (m/sec)');
+        title_string = strcat('Range-Doppler, Tx2, CPI=',num2str(ii)); title(title_string);
+        
+        pause(0.5);
+
     end
-  
-    %only Range bins >=131 have target information, earlier range bins are
-    %due to antenna coupling, TX leaking into RX, delays in the radar.
-    % row range-bins 0:170, columns :pulse_no 1:M
-
-%     phase_history1=phase_history1(131:end,:);
-%     phase_history2=phase_history2(131:end,:);
-
-    phase_history1 = phase_history1';
-    phase_history2 = phase_history2';
-    
-    % phase_history matrix: row range-bins 0:170, columns :pulse_no 1:M
-    % Construct Range Doppler map from the two antennas and display.
-    % Consider canceling stationary clutter (two/three pulse canceller, or 
-    % subtracting average (across slow time) range-profile from each return
-    
-    % SUBTRACT SLOW TIME AVERAGE
-%     phase_history1=phase_history1 - mean(phase_history1,1);
-%     phase_history2=phase_history2 - mean(phase_history2,1);
-
-    % TWO PULSE CANCELLER
-    
-
-    % GRAPH
-    figure(33);
-    
-    taugrid=(0:300);
-    nugrid=1/M*(-M/2:1:(M/2)-1);
-
-    rangedoppler1=fftshift( fft(phase_history1,M,1),1);
-    rangedoppler2=fftshift( fft(phase_history2,M,1),1);
-    
-    subplot(2,2,1)
-    imagesc(taugrid*Ts*c/2,1:Np,abs(phase_history1));
-    xlabel('Range (m)'); ylabel('Pulse No');
-    title_string = strcat('Slow-Fast Time, Tx1, CPI=',num2str(ii)); title(title_string);
-    
-    subplot(2,2,3)
-    imagesc(taugrid*Ts*c/2,nugrid*lambda*fp/2, abs(rangedoppler1))
-    xlabel('Range (m)'); ylabel('Velocity (m/sec)');
-    title_string = strcat('Range-Doppler, Tx1, CPI=',num2str(ii)); title(title_string);
-    
-    subplot(2,2,2)
-    imagesc(taugrid*Ts*c/2,1:Np,abs(phase_history2));
-    xlabel('Range (m)'); ylabel('Pulse No');
-    title_string = strcat('Slow-Fast Time, Tx2, CPI=',num2str(ii)); title(title_string);
-    
-    subplot(2,2,4)
-    imagesc(taugrid*Ts*c/2,nugrid*lambda*fp/2, abs(rangedoppler2))
-    xlabel('Range (m)'); ylabel('Velocity (m/sec)');
-    title_string = strcat('Range-Doppler, Tx2, CPI=',num2str(ii)); title(title_string);
-
+    fclose(fid);
 end
-
-fclose(fid);

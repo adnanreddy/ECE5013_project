@@ -55,8 +55,8 @@ tx1=[ 0, lambda/4]; tx2=[0, -lambda/4]; rx=[0,0];
 % calculate azimuth angle, range, and received signals at each location
 for k=0:Np-1
 
-%     target=[R0*cosd(theta) R0*sind(theta)+k*Tp*v]; % default
-    target = [initial_x initial_y(CPI)+k*Tp*v]; % for CPI for loop, COMMENT OTHERWISE
+    target=[R0*cosd(theta) R0*sind(theta)+k*Tp*v]; % default
+%     target = [initial_x initial_y(CPI)+k*Tp*v]; % for CPI for loop, COMMENT OTHERWISE
     
     Rup1 = norm(tx1-target);    % Rup1 = distance between TX1 antenna and target
     Rup2 = norm(tx2-target);    % Rup2 = distance between TX2 antenna and target
@@ -117,21 +117,21 @@ rangedoppler2=fftshift( fft(matcharray2,M,1),1);
 
 %% Graph
 
-% subplot(2,2,1)
-% imagesc(taugrid*Ts*c/2,1:Np,abs(matcharray1));
-% xlabel('Range (m)'); ylabel('Pulse No');
-% 
-% subplot(2,2,2)
-% imagesc(taugrid*Ts*c/2,nugrid*lambda*fp/2, abs(rangedoppler1))
-% xlabel('Range (m)'); ylabel('Velocity (m/sec)');
-% 
-% subplot(2,2,3)
-% imagesc(taugrid*Ts*c/2,1:Np,abs(matcharray2));
-% xlabel('Range (m)'); ylabel('Pulse No');
-% 
-% subplot(2,2,4)
-% imagesc(taugrid*Ts*c/2,nugrid*lambda*fp/2, abs(rangedoppler2))
-% xlabel('Range (m)'); ylabel('Velocity (m/sec)');
+subplot(2,2,1)
+imagesc(taugrid*Ts*c/2,1:Np,abs(matcharray1));
+xlabel('Range (m)'); ylabel('Pulse No');
+
+subplot(2,2,2)
+imagesc(taugrid*Ts*c/2,nugrid*lambda*fp/2, abs(rangedoppler1))
+xlabel('Range (m)'); ylabel('Velocity (m/sec)');
+
+subplot(2,2,3)
+imagesc(taugrid*Ts*c/2,1:Np,abs(matcharray2));
+xlabel('Range (m)'); ylabel('Pulse No');
+
+subplot(2,2,4)
+imagesc(taugrid*Ts*c/2,nugrid*lambda*fp/2, abs(rangedoppler2))
+xlabel('Range (m)'); ylabel('Velocity (m/sec)');
 
 %Things to try, window the match filter, window the pulses, add ground
 %return, use MTI cancelling, zeropad FFT, label the range doppler map in 

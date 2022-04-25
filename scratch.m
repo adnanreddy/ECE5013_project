@@ -16,3 +16,13 @@ subplot(2,1,1)
 plot(abs(conv(h1,conj(fliplr(h1)))))
 subplot(2,1,2)
 plot(angle(conv(h1,conj(fliplr(h1))))*180/pi)
+
+%% part 7
+
+for ii = 1:Np
+    [peak,index1] = max(abs(matcharray1(ii,:)));
+    [peak,index2] = max(abs(matcharray2(ii,:)));
+    
+    angles(ii) = abs(angle(matcharray1(ii,index1) / matcharray2(ii,index2)));
+end
+mean(asind(angles)*(lambda/2/pi)/(lambda/2))

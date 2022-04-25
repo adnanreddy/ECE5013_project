@@ -77,17 +77,20 @@ for ii=N_cpi:N_cpi % for testing
     % subtracting average (across slow time) range-profile from each return
     
     % SUBTRACT SLOW TIME AVERAGE
-    phase_history1=phase_history1 - mean(phase_history1);
-    phase_history2=phase_history2 - mean(phase_history2);
+%     phase_history1=phase_history1 - mean(phase_history1,1);
+%     phase_history2=phase_history2 - mean(phase_history2,1);
+
+
 
     % GRAPH
     figure(33);
     
     taugrid=(0:300);
     nugrid=1/M*(-M/2:1:(M/2)-1);
+    
 
-    rangedoppler1=fftshift( fft(phase_history1,M,1),1);
-    rangedoppler2=fftshift( fft(phase_history2,M,1),1);
+    rangedoppler1=fftshift( fft(hamming(M).*phase_history1,M,1),1);
+    rangedoppler2=fftshift( fft(hamming(M).*phase_history2,M,1),1);
     
     subplot(2,2,1)
     imagesc(taugrid*Ts*c/2,1:Np,abs(phase_history1));

@@ -14,7 +14,7 @@ lambda = c/fc;          % wavelength of radar system
 BW = 125e6;             % total system bandwidth = 125 MHz
 fp = 1e3;               % pulse repetition frequency = 1 kHz
 Tp = 1/fp;              % pulse repetition interval = 1 ms
-Np = 1;                % number of pulses
+Np = 64;                % number of pulses
 
 
 beta = 120e6;           % sweep bandwidth = 120 MHz
@@ -36,7 +36,7 @@ t = 0:Ts:Np*Tp-Ts;     % time vector (Np+1) Tp long,
 
 %% Parameters for Target
 R0 = 30;            % R0 is initially 30 meters
-theta = -10;        % theta = azimuth angle, initially at -10 degrees
+theta = 10;        % theta = azimuth angle, initially at -10 degrees
 v = 10;             % vertical  velocity is 10 m/s
 RCS = 1;            % radar cross-section
 %CPI = 881/64        % coherent processing interval
