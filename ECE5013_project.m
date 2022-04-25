@@ -36,7 +36,7 @@ t = 0:Ts:Np*Tp-Ts;     % time vector (Np+1) Tp long,
 
 %% Parameters for Target
 R0 = 30;            % R0 is initially 30 meters
-theta = 10;        % theta = azimuth angle, initially at -10 degrees
+theta = -10;        % theta = azimuth angle, initially at -10 degrees
 v = 10;             % vertical  velocity is 10 m/s
 RCS = 1;            % radar cross-section
 %CPI = 881/64        % coherent processing interval
@@ -139,11 +139,45 @@ xlabel('Range (m)'); ylabel('Velocity (m/sec)');
 
 %% SNR
  
-disp('theoretical')
-disp(Pt*Gt*Gr*lambda^2*RCS/(4*pi)^3/Rdown^4/(K*T0*BW*F)) % estimate using Rdown to account for two different distances
-disp('experimental')
-disp(   (mean(abs(za1).^2)/mean(abs(noise).^2)) /   (fp*tau))
-disp(   (mean(abs(za2).^2)/mean(abs(noise).^2)) /   (fp*tau))
+SNR_theoretical = Pt*Gt*Gr*lambda^2*RCS/(4*pi)^3/Rdown^4/(K*T0*BW*F); % estimate using Rdown to account for two different distances
+SNR_exp1 = (mean(abs(za1).^2)/mean(abs(noise).^2)) /   (fp*tau); % |signal|^2 / |noise|^2
+SNR_exp2 = (mean(abs(za2).^2)/mean(abs(noise).^2)) /   (fp*tau);
+
+%% Range and Velocity
+
+ard1 = abs(rangedoppler1); ard2 = abs(rangedoppler2);
+[rows,cols] = size(ard1); % if they aren't the same size I'm out of luck
+
+max = [0 0];
+index = [1 1 1 1];
+
+for row = 1:rows
+    for col = 1:cols
+        if max(1) < ard(row,col)
+            max(1) = ard(row,col);
+            index(1:2) = [row,col];
+        end
+        if max(2) < ard(row,col)
+            max(2) = ard(row,col);
+            index(3:4) = [row,col];
+        end
+    end
+end
+
+range_CPI_1 = taugrid(index(2))*Ts*c/2;
+velocity_CPI_1 = nugrid(index(1))*lambda*fp/2;
+range_CPI_2 = taugrid(index(4))*Ts*c/2;
+velocity_CPI_2 = nugrid(index(3))*lambda*fp/2;
+
+%% Angle
+
+for ii = 1:Np
+    [peak,index1] = max(abs(matcharray1(ii,:))); % find the range bin with highest magnitude return
+    [peak,index2] = max(abs(matcharray2(ii,:)));
+    
+    angle_pulse(ii) = (angle(matcharray1(ii,index1) / matcharray2(ii,index2))); % absolute phase difference
+end
+angle_CPI = mean(asind(angle_pulse)*(lambda/2/pi)/(lambda/2)); % see report for diagram
 
 %% Rectangular Pulse
 function p = rpulse(t,tau)
