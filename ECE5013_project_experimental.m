@@ -47,8 +47,8 @@ M=256; % number of pulses in one CPI
 N_cpi= 32; % number of CPIs in data
 
 figure(800);
-
 while size(findobj(800)) > 0
+    figure(800);
     fid=fopen('measured_data.bin','rb');
     for ii=1:N_cpi
     % for ii=N_cpi:N_cpi % for testing
@@ -114,8 +114,48 @@ while size(findobj(800)) > 0
         xlabel('Range (m)'); ylabel('Velocity (m/sec)');
         title_string = strcat('Range-Doppler, Tx2, CPI=',num2str(ii)); title(title_string);
         
+        %% Range and Velocity
+
+        ard1 = abs(rangedoppler1); ard2 = abs(rangedoppler2); % absolute range doppler
+        [rows,cols] = size(ard1); % if they aren't the same size I'm out of luck
+
+        peaks = [0 0];
+        index = [1 1 1 1];
+
+        for row = 1:rows
+            for col = 1:cols
+                if peaks(1) < ard1(row,col)
+                    peaks(1) = ard1(row,col);
+                    index(1:2) = [row,col];
+                end
+                if peaks(2) < ard2(row,col)
+                    peaks(2) = ard2(row,col);
+                    index(3:4) = [row,col];
+                end
+            end
+        end
+
+        range_CPI_1(ii) = taugrid(index(2))*Ts*c/2;
+        velocity_CPI_1(ii) = nugrid(index(1))*lambda*fp/2;
+        range_CPI_2(ii) = taugrid(index(4))*Ts*c/2;
+        velocity_CPI_2(ii) = nugrid(index(3))*lambda*fp/2;
+        
+        % Angle
+
+        for jj = 1:Np
+            [peak,index1] = max(abs(matcharray1(jj,:))); % find the range bin with highest magnitude return
+            [peak,index2] = max(abs(matcharray2(jj,:)));
+
+            angle_pulse(jj) = (angle(matcharray1(jj,index1) / matcharray2(jj,index2))); % absolute phase difference
+        end
+        angle_CPI(ii) = mean(asind(angle_pulse)*(lambda/2/pi)/(lambda/2)); % see report for diagram
+        
         pause(0.5);
 
     end
     fclose(fid);
+    
+    figure(801); plot(range_CPI_1); hold on; plot(range_CPI_2); title('Range'); xlabel('CPI'); ylabel('Meters'); legend('Tx1','Tx2'); hold off; saveas(gcf,'range_exp.jpg')
+    figure(802); plot(velocity_CPI_1); hold on; plot(velocity_CPI_2); title('Velocity'); xlabel('CPI'); ylabel('Meters per Second'); hold off; saveas(gcf,'velocity_exp.jpg')
+    figure(803); scatter(1:N_cpi,angle_CPI); title('Azimuth Angle'); xlabel('CPI'); ylabel('Degrees'); saveas(gcf,'angle_exp.jpg')
 end
