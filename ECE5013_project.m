@@ -55,8 +55,8 @@ tx1=[ 0, lambda/4]; tx2=[0, -lambda/4]; rx=[0,0];
 % calculate azimuth angle, range, and received signals at each location
 for k=0:Np-1
 
-    target=[R0*cosd(theta) R0*sind(theta)+k*Tp*v]; % default
-%     target = [initial_x initial_y(CPI)+k*Tp*v]; % for CPI for loop, COMMENT OTHERWISE
+%     target=[R0*cosd(theta) R0*sind(theta)+k*Tp*v]; % default
+    target = [initial_x initial_y(i)+k*Tp*v]; % for CPI for loop, COMMENT OTHERWISE
     
     Rup1 = norm(tx1-target);    % Rup1 = distance between TX1 antenna and target
     Rup2 = norm(tx2-target);    % Rup2 = distance between TX2 antenna and target
@@ -145,20 +145,20 @@ SNR_exp2 = (mean(abs(za2).^2)/mean(abs(noise).^2)) /   (fp*tau);
 
 %% Range and Velocity
 
-ard1 = abs(rangedoppler1); ard2 = abs(rangedoppler2);
+ard1 = abs(rangedoppler1); ard2 = abs(rangedoppler2); % absolute range doppler
 [rows,cols] = size(ard1); % if they aren't the same size I'm out of luck
 
-max = [0 0];
+peaks = [0 0];
 index = [1 1 1 1];
 
 for row = 1:rows
     for col = 1:cols
-        if max(1) < ard(row,col)
-            max(1) = ard(row,col);
+        if peaks(1) < ard1(row,col)
+            peaks(1) = ard1(row,col);
             index(1:2) = [row,col];
         end
-        if max(2) < ard(row,col)
-            max(2) = ard(row,col);
+        if peaks(2) < ard2(row,col)
+            peaks(2) = ard2(row,col);
             index(3:4) = [row,col];
         end
     end
